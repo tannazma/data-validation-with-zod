@@ -41,8 +41,12 @@ export default function Home() {
       const data = await response.json();
       const animalListSchema = z.array(animalSchema);
       const parsedResult = animalListSchema.safeParse(data);
+      console.log(parsedResult.success);
       if (parsedResult.success) {
+        console.log("SUCCES", parsedResult.data);
         setAnimals(parsedResult.data);
+      } else {
+        console.log("ERRORS", parsedResult.error.format());
       }
     };
     getAnimals();
