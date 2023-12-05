@@ -21,16 +21,16 @@ const animalSchema = z
 
 type Animal = z.infer<typeof animalSchema>;
 
-const emailValidators = z.string().email();
-const emailArrayValidator = z.array(emailValidators);
-const safePasswordValidator = z.string().min(8).includes("#");
+// const emailValidators = z.string().email();
+// const emailArrayValidator = z.array(emailValidators);
+// const safePasswordValidator = z.string().min(8).includes("#");
 
-const userLoginValidator = z.object({
-  email: emailArrayValidator,
-  password: safePasswordValidator,
-});
+// const userLoginValidator = z.object({
+//   email: emailArrayValidator,
+//   password: safePasswordValidator,
+// });
 
-const arrayOfAnimalsValidator = z.array(animalSchema);
+// const arrayOfAnimalsValidator = z.array(animalSchema);
 
 export default function Home() {
   const [animals, setAnimals] = useState<Animal[]>([]);
@@ -39,7 +39,11 @@ export default function Home() {
     const getAnimals = async () => {
       const response = await fetch("http://localhost:3001/animals");
       const data = await response.json();
-      setAnimals(data);
+      const animalListSchema = z.array(animalSchema);
+      const parsedResult = animalListSchema.safeParse(data);
+      if (parsedResult.success) {
+        setAnimals(parsedResult.data);
+      }
     };
     getAnimals();
   }, []);
