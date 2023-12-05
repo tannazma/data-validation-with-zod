@@ -37,7 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     const getAnimals = async () => {
-      const response = await fetch("http://localhost:3001/animals");
+      const response = await fetch("http://localhost:3101/animals");
       const data = await response.json();
       const animalListSchema = z.array(animalSchema);
       const parsedResult = animalListSchema.safeParse(data);
