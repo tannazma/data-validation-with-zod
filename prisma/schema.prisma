@@ -15,3 +15,12 @@ model Tweet {
   message String
   private Boolean
 }
+
+model Animal {
+  id         Int     @id @default(autoincrement())
+  name       String
+  kind       String
+  age        Int
+  hasBeenFed Boolean
+  imgUrl     String
+}

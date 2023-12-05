@@ -1,21 +1,29 @@
 import express from "express";
 import { json } from "express";
-import animals from "./animals.json";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
+const port = 3101;
 
 app.use(cors());
 app.use(json());
 
-const port = 3101;
+// interface Animal {
+//   id: number;
+//   name: string;
+//   kind: string;
+//   age: number;
+//   hasBeenFed: boolean;
+//   imgUrl: string;
+// }
 
-app.get("/animals", (req, res) => {
+app.get("/animals", async (req, res) => {
   // Getting data from Prisma we can 'trust'
   // prisma.animals.findMany()
-  res.send(animals);
+  const allAnimals = await prisma.animal.findMany();
+  res.send(allAnimals);
 });
 
 app.post("/tweets", async (req, res) => {
