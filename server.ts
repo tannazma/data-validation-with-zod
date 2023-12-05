@@ -2,6 +2,7 @@ import express from "express";
 import { json } from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -26,20 +27,30 @@ app.get("/animals", async (req, res) => {
   res.send(allAnimals);
 });
 
+// creating tweet schema in zod
+const tweetValidator = z
+  .object({
+    message: z.string().max(180),
+    private: z.boolean(),
+  })
+  .strict();
+
 app.post("/tweets", async (req, res) => {
   const requestBody = req.body;
 
-  if ("message" in requestBody && "private" in requestBody) {
+  const parsedBody = tweetValidator.safeParse(requestBody);
+
+  if (parsedBody.success) {
     try {
       const newTweet = await prisma.tweet.create({
-        data: requestBody,
+        data: parsedBody.data,
       });
       res.status(201).send(newTweet);
     } catch (error) {
       res.status(500).send({ message: "Something went wrong!" });
     }
   } else {
-    res.status(400).send({ message: "'message' and 'private' are required" });
+    res.status(400).send(parsedBody.error.flatten());
   }
 });
 
