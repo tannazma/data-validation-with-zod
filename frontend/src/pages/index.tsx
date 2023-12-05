@@ -46,7 +46,7 @@ export default function Home() {
         console.log("SUCCES", parsedResult.data);
         setAnimals(parsedResult.data);
       } else {
-        console.log("ERRORS", parsedResult.error.format());
+        console.log("ERRORS", parsedResult.error.flatten());
       }
     };
     getAnimals();
