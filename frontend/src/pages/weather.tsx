@@ -1,12 +1,26 @@
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
-interface Weather {
-  date: string;
-  temperature: number;
-  weatherIcon: string;
-  title: string;
-  description: string;
-}
+// interface Weather {
+//   date: string;
+//   temperature: number;
+//   weatherIcon: string;
+//   title: string;
+//   description: string;
+// }
+
+const weatherSchema = z
+  .object({
+    date: z.string(),
+    temperature: z.number().int(),
+    weatherIcon: z.string(),
+    title: z.string(),
+    description: z.string(),
+  })
+  .strict();
+
+type Weather = z.infer<typeof weatherSchema>;
+const weatherArray = z.array(weatherSchema);
 
 const Weather = () => {
   const [weather, setWeather] = useState<Weather[] | null>(null);
@@ -19,7 +33,13 @@ const Weather = () => {
           "https://reader.mindmingle.nl/api/exercises/react/weather"
         );
         const data = await response.json();
-        setWeather(data);
+        const validated = weatherArray.safeParse(data);
+        if (validated.success) {
+          setWeather(validated.data);
+        } else {
+          console.log(validated.error.flatten());
+        }
+        // const data = await response.json();
       } catch (error) {
         console.log("Something went wrong");
       }
