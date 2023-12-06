@@ -1,13 +1,35 @@
 import { useForm } from "react-hook-form";
 import React, { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface DataFromForm {
-  serviceChoice: string;
-  experience: string;
-  rentalDays: number;
-  emotionChoice: string;
-  vehicleColor: string;
-}
+// interface DataFromForm {
+//   serviceChoice: string;
+//   experience: string;
+//   rentalDays: number;
+//   emotionChoice: string;
+//   vehicleColor: string;
+// }
+
+const dataFromFormValidator = z.object({
+  serviceChoice: z.union([
+    z.literal("🚴 Bike rental"),
+    z.literal("🚗 Car rental"),
+    z.literal("🚁 Helicopter rental"),
+    z.literal("🚀 Spaceship rental"),
+  ]),
+  experience: z.string().nonempty(),
+  rentalDays: z.number().min(0),
+  emotionChoice: z.union([
+    z.literal("😡"),
+    z.literal("😐"),
+    z.literal("🙂"),
+    z.literal("😁"),
+  ]),
+  vehicleColor: z.string(),
+});
+
+type DataFromForm = z.infer<typeof dataFromFormValidator>;
 
 const Form = () => {
   const handleFormSubmit = (data: DataFromForm) => {
@@ -30,10 +52,15 @@ const Form = () => {
     // );
   };
 
-console.log(useForm)
-debugger;
+  console.log(useForm);
 
-  const { register, handleSubmit } = useForm<DataFromForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<DataFromForm>({
+    resolver: zodResolver(dataFromFormValidator),
+  });
 
   return (
     <main>
@@ -46,6 +73,9 @@ debugger;
           <option>🚁 Helicopter rental</option>
           <option>🚀 Spaceship rental</option>
         </select>
+        {errors.serviceChoice && (
+          <p className="error-msg">{errors.serviceChoice.message}</p>
+        )}
 
         <label htmlFor="vehicle-color">What color was your vehicle?</label>
         <input
@@ -53,6 +83,9 @@ debugger;
           id="vehicle-color"
           {...register("vehicleColor")}
         ></input>
+        {errors.vehicleColor && (
+          <p className="error-msg">{errors.vehicleColor.message}</p>
+        )}
 
         <label htmlFor="rental-days">How many days was your rental?</label>
         <input
@@ -60,6 +93,9 @@ debugger;
           id="rental-days"
           {...register("rentalDays", { valueAsNumber: true })}
         ></input>
+        {errors.rentalDays && (
+          <p className="error-msg">{errors.rentalDays.message}</p>
+        )}
 
         <label htmlFor="experience">
           How would you describe the experience?
@@ -69,6 +105,9 @@ debugger;
           {...register("experience")}
           placeholder="My experience was..."
         ></textarea>
+        {errors.experience && (
+          <p className="error-msg">{errors.experience.message}</p>
+        )}
 
         <label htmlFor="emoition-choice">
           What emotion did you feel during the rental period?
@@ -79,6 +118,9 @@ debugger;
           <option>🙂</option>
           <option>😁</option>
         </select>
+        {errors.emotionChoice && (
+          <p className="error-msg">{errors.emotionChoice.message}</p>
+        )}
 
         <button type="submit">Submit</button>
       </form>
